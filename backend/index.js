@@ -1,21 +1,22 @@
 const path = require("path");
-
-// 🔒 Load .env using absolute path (PERMANENT FIX)
 require("dotenv").config({
   path: path.join(__dirname, ".env"),
 });
 
 const express = require("express");
 const cors = require("cors");
-
 const askGemini = require("./gemini");
 
 const app = express();
 
-// Middleware
+// ✅ FIXED CORS
 app.use(cors({
   origin: "https://ai-chat-buddy-jade.vercel.app",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
+app.options("*", cors());
 
 app.use(express.json());
 
@@ -24,18 +25,28 @@ app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
-// Ask Gemini route
-app.post("/ask", (req, res) => {
-  console.log("✅ /ask route hit");
-  console.log("Body:", req.body);
+// ✅ Working /ask route
+app.post("/ask", async (req, res) => {
+  try {
+    console.log("✅ /ask route hit");
+    const { question } = req.body;
 
-  return res.json({ answer: "TEST RESPONSE WORKING" });
+    if (!question) {
+      return res.status(400).json({ error: "Question is required" });
+    }
+
+    // TEMP TEST (replace later with Gemini)
+    const answer = "TEST RESPONSE WORKING";
+
+    res.json({ answer });
+  } catch (err) {
+    console.error("❌ Error in /ask:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
-
 
 // Port handling
 const PORT = process.env.PORT || 5050;
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
