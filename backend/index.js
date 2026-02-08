@@ -5,18 +5,15 @@ require("dotenv").config({
 
 const express = require("express");
 const cors = require("cors");
-const askGemini = require("./gemini");
 
 const app = express();
 
-// ✅ FIXED CORS
+// ✅ CORS (Express 5 compatible)
 app.use(cors({
   origin: "https://ai-chat-buddy-jade.vercel.app",
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
-
-app.options("*", cors());
 
 app.use(express.json());
 
@@ -25,27 +22,17 @@ app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
-// ✅ Working /ask route
+// Ask route
 app.post("/ask", async (req, res) => {
-  try {
-    console.log("✅ /ask route hit");
-    const { question } = req.body;
+  const { question } = req.body;
+  console.log("Question:", question);
 
-    if (!question) {
-      return res.status(400).json({ error: "Question is required" });
-    }
-
-    // TEMP TEST (replace later with Gemini)
-    const answer = "TEST RESPONSE WORKING";
-
-    res.json({ answer });
-  } catch (err) {
-    console.error("❌ Error in /ask:", err);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+  res.json({
+    answer: "TEST RESPONSE WORKING"
+  });
 });
 
-// Port handling
+// Port
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
