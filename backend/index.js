@@ -14,7 +14,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: "https://ai-chat-buddy-jade.vercel.app/",
+  origin: "https://ai-chat-buddy-jade.vercel.app",
 }));
 
 app.use(express.json());
