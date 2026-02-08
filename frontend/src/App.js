@@ -23,6 +23,8 @@ function App() {
       });
 
       const data = await response.json();
+      console.log("Backend data:", data);
+      setAnswer(data.answer);
 
       if (!response.ok) {
         throw new Error("Failed to fetch AI response");
