@@ -1,29 +1,12 @@
-const axios = require("axios");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const askGemini = async (question) => {
-  const response = await axios.post(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
-    {
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: question }],
-        },
-      ],
-    },
-    {
-      params: {
-        key: process.env.GEMINI_API_KEY,
-      },
-      timeout: 10000,
-    }
-  );
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-  if (!response.data.candidates?.length) {
-    throw new Error("No response from Gemini");
-  }
+async function askGemini(question) {
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-  return response.data.candidates[0].content.parts[0].text;
-};
+  const result = await model.generateContent(question);
+  return result.response.text();
+}
 
 module.exports = askGemini;
