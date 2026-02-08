@@ -9,21 +9,29 @@ const askGemini = require("./gemini");
 
 const app = express();
 
-// ✅ CORS (Express 5 compatible)
-app.use(cors({
-  origin: "https://ai-chat-buddy-jade.vercel.app",
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+/* =======================
+   CORS CONFIG (PRODUCTION)
+   ======================= */
+app.use(
+  cors({
+    origin: "https://ai-chat-buddy-jade.vercel.app",
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.json());
 
-// Health check
+/* =======================
+   HEALTH CHECK
+   ======================= */
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
-// 🤖 Ask Gemini route
+/* =======================
+   ASK AI ROUTE
+   ======================= */
 app.post("/ask", async (req, res) => {
   try {
     const { question } = req.body;
@@ -34,15 +42,18 @@ app.post("/ask", async (req, res) => {
 
     const answer = await askGemini(question);
 
-    res.json({ answer });
-  } catch (err) {
-    console.error("❌ Gemini Error:", err);
-    res.status(500).json({ error: "AI failed to respond" });
+    return res.json({ answer });
+  } catch (error) {
+    console.error("❌ Error in /ask:", error);
+    return res.status(500).json({ error: "AI failed to respond" });
   }
 });
 
-// Port
+/* =======================
+   START SERVER
+   ======================= */
 const PORT = process.env.PORT || 5050;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
