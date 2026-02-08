@@ -5,6 +5,7 @@ require("dotenv").config({
 
 const express = require("express");
 const cors = require("cors");
+const askGemini = require("./gemini");
 
 const app = express();
 
@@ -22,14 +23,22 @@ app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
-// Ask route
+// 🤖 Ask Gemini route
 app.post("/ask", async (req, res) => {
-  const { question } = req.body;
-  console.log("Question:", question);
+  try {
+    const { question } = req.body;
 
-  res.json({
-    answer: "TEST RESPONSE WORKING"
-  });
+    if (!question) {
+      return res.status(400).json({ error: "Question is required" });
+    }
+
+    const answer = await askGemini(question);
+
+    res.json({ answer });
+  } catch (err) {
+    console.error("❌ Gemini Error:", err);
+    res.status(500).json({ error: "AI failed to respond" });
+  }
 });
 
 // Port
